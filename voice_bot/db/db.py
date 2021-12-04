@@ -58,14 +58,22 @@ def promote(_id):
     with db:
         if not Admins.select().where(Admins.id==_id).exists():
             Admins.create(id=_id)
+            return True
         else:
-            Admins.update(promot=not Admins.get(Admins.id==_id).promot).where(Admins.id==_id).execute()
+            accep = not Admins.get(Admins.id==_id).promot
+            Admins.update(promot=accep).where(Admins.id==_id).execute()
+            return accep
 
 def get_adms(_id):
-    return Admins.select().where(Admins.id==_id).exists()
+    if Admins.select().where(Admins.id==_id).exists():
+        g =  Admins.get(Admins.id==_id).promot
+        print(g)
+        return g
+    else:
+        return False
 
 def get_me_sticker(_id):
-    return Stickers.select().where(Stickers.creator == _id,Stickers.active==True)
+    return Stickers.select(Stickers.name,Stickers.id).where(Stickers.creator == _id,Stickers.active==True)
 
 def saves_st(stick_id):
     Stickers.update(active=True).where(Stickers.id == stick_id).execute()
@@ -89,9 +97,9 @@ async def sendd(mess):
 
 def get_stck():
     tex=''
-    for i in Stickers.select().where(Stickers.active==True):
+    for i in Stickers.select(Stickers.active==True,Stickers.name,Stickers.id):
         tex+=f'/{i.id} - {i.name}\n'
-    return tex
+    return tex[:30]
 
 def get_stats():
     return len(Users.select(Users.id)),len(Stickers.select(Stickers.active==True))
@@ -102,15 +110,13 @@ def ban(_id):
 def unban(_id):
     Users.update(banned=False).where(Users.id == _id).execute()
 
-def save_stick(voice_hash,creator,tags,name):
+def save_stick(voice_hash,creator,name,tags):
     with db:
         Stickers.create(voice_hash=voice_hash,creator=creator,tags=tags,name=name)
         return Stickers.get(Stickers.voice_hash==voice_hash).id
 
-
-
 def get_stick():
-    return Stickers.select(Stickers.id,Stickers.tags,Stickers.name,Stickers.voice_hash,Stickers.active==True)
+    return Stickers.select(Stickers.id,Stickers.name,Stickers.tags,Stickers.voice_hash).where(Stickers.active==True)
      
 def new_stc_use(_id):
     Stickers.update(used=Stickers.get(Stickers.voice_hash==_id).used + 1).where(Stickers.voice_hash==_id).execute()
@@ -123,10 +129,10 @@ async def find(text,message,bot):
     stata = await error_hundler(message,bot,key=message)
     if stata['status'] == False:
         data.append(InlineQueryResultArticle(
-                title='Botdan foydalanish uchun kanalga obuna boling!',
+                title='Для работы с ботом необходима подписка',
                 id=1000000,
                 url=load_cfg()['link'],
-                input_message_content=InputTextMessageContent(f"<a href='{load_cfg()['link']}'>Kanalga obuna bolish</a>",parse_mode='html')
+                input_message_content=InputTextMessageContent(f"<a href='{load_cfg()['link']}'>Получить доступ</a>",parse_mode='html')
                 )
             )
         return data
@@ -154,5 +160,5 @@ async def find(text,message,bot):
                 input_message_content=InputTextMessageContent('Нечего не найдено')
                 )
             )
-    return data
+    return data[:25]
 

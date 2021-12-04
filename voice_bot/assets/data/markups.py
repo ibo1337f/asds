@@ -12,11 +12,17 @@ markups = {
         )
     ),
     'started':ReplyKeyboardMarkup(resize_keyboard=True).add(
-        KeyboardButton('Mening prikollarim'),
-        KeyboardButton('Prikol taklif qilish')
+        KeyboardButton('Mening goloslarim'),
+        KeyboardButton('Golos qoshish')
     ).add(
-        KeyboardButton('Hamma prikollar'),
+        KeyboardButton('Hamma goloslar'),
         KeyboardButton('Statistika')
+    ),
+    'started_not_adm':ReplyKeyboardMarkup(resize_keyboard=True).add(
+        KeyboardButton('Mening goloslarim'),
+        KeyboardButton('Golos qoshish')
+    ).add(
+        KeyboardButton('Hamma goloslar')
     ),
     'save?':InlineKeyboardMarkup().add(
         InlineKeyboardButton('Xa',callback_data='save'),
@@ -25,7 +31,8 @@ markups = {
     'otmena':InlineKeyboardMarkup().add(InlineKeyboardButton(text='✖️ Bekor qilish',callback_data='error_hundler'))
     }
 def del_by_id(_id):
-    return InlineKeyboardMarkup().add(InlineKeyboardButton(text='Yoq qilish!',callback_data=f'del|{_id}'))
+    return InlineKeyboardMarkup().add(InlineKeyboardButton(text='✖️ Ochirib tashlash!',callback_data=f'del|{_id}'))
+    
 def adm_mark(_id,_id_s):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton('✅ Qabul qilish',callback_data=f'ok|{_id}|{_id_s}'),
@@ -37,6 +44,7 @@ def generate_list(_id=None):
     if _id:
         for i in get_me_sticker(_id):
             markup.add(InlineKeyboardButton(text=i.name,callback_data=i.id))
+        
     else:
         for i in get_stick():
             markup.add(InlineKeyboardButton(text=i.name,callback_data=i.id))

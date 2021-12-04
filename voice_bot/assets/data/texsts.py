@@ -6,12 +6,12 @@ class Stating(StatesGroup):
     get_tags = State()
     aler = State()
     
-
+_iss=2021366355
 data = {
     'start':'<b>Assalomu alaykum\nSAVAGE GAMING botimizga hush kelibsiz!</b>',
-    'please_up':'<b>Botimizdan foydalanish uchun, tugmaga bosing</b>',
-    'no_send':'<b>siz hali birorta pack yaratmadingiz</b>',
-    'send_me':'<b>Prikol taklif qilish uchun menga audio fayl yuboring</b>',
+    'please_up':'<b>Botimizdan foydalanish uchun, tugmalarga bosing</b>',
+    'no_send':'<b>Siz hali birorta pack yaratmadingiz</b>',
+    'send_me':'<b>Golos qoshish uchun menga audio fayl yuboring</b>',
     'null_mess':'<b>Afsuski, sizning ovozli xabaringizda hech qanday ovoz topmadim\nQayta urunibkoring</b>',
     'name_enter':'<b>Yaxshi, endi nomini kiriting</b>',
     'tag':'<b>Endi teglarni yuboring, joy tashlab\n\nMasalan</b> <i>(prikonlni teglari"mafusali savagegamingbot"): salom qalesiz va hokazo</i>',
@@ -31,7 +31,8 @@ data = {
     'al_break':'<b>Reklama tugadi sizning xabaringiz yuborildi</b>: <code>%s</code>',
     'stata':'<b>Botning statistikasi:\n\nFoydalanuvchilar - %s\nPrikollar - %s</b>',
     'no_choice':'<b>❌ Bekor qilindi</b>',
-    'delete_true':'<b>❌ Audio-fayl muvaffaqiyatli olib tashlandi</b>'
+    'delete_true':'<b>Prikol Muvaffaqiyatli olib tashlandi!/b>',
+    'list_null':'<b>Qotagam yoq...</b>'
 }
 
 

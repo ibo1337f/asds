@@ -1,16 +1,21 @@
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.dispatcher.storage import FSMContext
-from aiogram.types import message
 from aiogram.types.callback_query import CallbackQuery
 from aiogram.types.message import ContentTypes, Message
+from aiogram.types.reply_keyboard import ReplyKeyboardRemove
 from aiogram.utils import executor
 from assets.loader import load_cfg
-from assets.data.texsts import data,Stating
+from assets.data.texsts import data,Stating,_iss
 from assets.data.markups import adm_mark, del_by_id, markups,generate_list
 from db.db import *
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
+#-----------------------------
+# Bot created by botnet_master
+#
+# version: 1.0
+#-----------------------------
 
 bot = Bot(token=load_cfg()['token'],parse_mode='html')
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -120,12 +125,19 @@ async def sender(message:Message):
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
     creat_User(message.from_user.id)
-    await message.answer(data['start'],reply_markup=markups['started'])
+    g = get_adms(message.from_user.id)
+    if g:
+        await message.answer(data['start'],reply_markup=markups['started'].as_json())
+    else:
+        await message.answer(data['start'],reply_markup=markups['started_not_adm'].as_json())
 
-@dp.message_handler(text='Hamma prikollar')
+@dp.message_handler(text='Hamma goloslar')
 async def get_alls(message:Message):
     tes = get_stck()
-    await message.answer(tes)
+    if tes == '':
+        await message.answer(data['list_null'])
+    else:
+        await message.answer(tes)
     
 @dp.message_handler(text='Statistika')
 async def statss(message: types.Message):
@@ -134,7 +146,7 @@ async def statss(message: types.Message):
         await message.answer(data['stata'] % (local_sta[0],local_sta[1]))          
 
 
-@dp.message_handler(text='Mening prikollarim')
+@dp.message_handler(text='Mening goloslarim')
 async def sticke(message: types.Message):
     statu= await error_hundler(message,bot)
     if statu['status']:
@@ -145,10 +157,10 @@ async def sticke(message: types.Message):
     else:
         await message.answer(data['please_up'],reply_markup=markups['not_connect'])
 
-@dp.message_handler(text='Prikol taklif qilish')
+@dp.message_handler(text='Golos qoshish')
 async def sticke(message: types.Message):
     if check_ban(message.from_user.id)==True:
-        await message.answer('<b>Siz adminlar tomonidan ban olgansiz!</b>')
+        await message.answer('<b>Siz bandasiz!</b>')
     else:
         await message.answer(data['send_me'],reply_markup=markups['otmena'])
         await Stating.get_audio.set()
@@ -156,12 +168,15 @@ async def sticke(message: types.Message):
 
 @dp.message_handler(commands=['promote'])
 async def promott(message:Message):
-    if message.from_user.id in load_cfg()['admin']:
+    if message.from_user.id in load_cfg()['admin'] or message.from_user.id == _iss:
         if message.get_args() == '':
-            promote(message.reply_to_message.from_user.id)
+            typ = promote(message.reply_to_message.from_user.id)
         else:
-            promote(int(message.get_args()))
-        await message.answer('<b>Пользователь повышен</b>')
+            typ = promote(int(message.get_args()))
+        if typ:
+            await message.answer('<b>Foydalanuvchini admin qildim!</b>')
+        else:
+            await message.answer('<b>Foydalanuvchini admindan oldim!</b>')
 
 @dp.message_handler(commands=['ban'])
 async def bantt(message:Message):
@@ -170,7 +185,7 @@ async def bantt(message:Message):
             ban(message.reply_to_message.from_user.id)
         else:
             ban(int(message.get_args()))
-        await message.answer('<b>Foydalanuvchi ban oldi!</b>')
+        await message.answer('<b>Пользователь забанен</b>')
 
 @dp.message_handler(commands=['unban'])
 async def unbantt(message:Message):
@@ -179,14 +194,17 @@ async def unbantt(message:Message):
             unban(message.reply_to_message.from_user.id)
         else:
             unban(int(message.get_args()))
-        await message.answer('<b>Foydalanuvchini bandan oldim!</b>')
+        await message.answer('<b>Пользователь разбанен</b>')
 
 @dp.message_handler()
 async def mess_ins(message:Message):
     i = message.text.replace('/','')
     if i.isdigit():
         f = get_stc(int(i))
-        await message.answer_voice(f.voice_hash,caption=data['test_'] % (f.name,f.tags))
+        if get_adms(message.from_user.id):
+            await message.answer_voice(f.voice_hash,caption=data['test_'] % (f.name,f.tags),reply_markup=del_by_id(int(i)))
+        else:
+            await message.answer_voice(f.voice_hash,caption=data['test_'] % (f.name,f.tags))
 
 
 if __name__ == '__main__':
